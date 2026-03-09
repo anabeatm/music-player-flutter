@@ -38,6 +38,7 @@ dependencies:
   audioplayers: ^6.5.1
   on_audio_query: 2.9.0
   permission_handler: ^11.3.0 
+  file_picker: ^8.1.2
 
 dev_dependencies:
   flutter_test:

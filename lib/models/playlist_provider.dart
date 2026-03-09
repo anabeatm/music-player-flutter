@@ -3,30 +3,36 @@ import 'package:flutter/material.dart';
 import 'package:minimal_music_player/models/song.dart';
 import 'dart:math';
 
+import 'package:on_audio_query/on_audio_query.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 class PlaylistProvider extends ChangeNotifier {
-  final List<Song> _playlist = [
-    // song 1
-    Song(
-      songName: "Do It",
-      artistName: "Stray kids",
-      albumArtImagePath: "assets/images/doit_album_cover.jpg",
-      audioPath: "audio/stray_kids_doit_audio.mp3",
-    ),
-    // song 2
-    Song(
-      songName: "No one noticed",
-      artistName: "The Marias",
-      albumArtImagePath: "assets/images/the_marias_album_cover.jpg",
-      audioPath: "audio/no_one_noticed_the_marias_audio.mp3",
-    ),
-    // song 3
-    Song(
-      songName: "Nana OST",
-      artistName: "Rose",
-      albumArtImagePath: "assets/images/nana_album_cover.jpg",
-      audioPath: "audio/nana_audio.mp3",
-    ),
-  ];
+  final OnAudioQuery _audioQuery = OnAudioQuery();
+  List<Song> _playlist = [];
+
+  // final List<Song> _playlist = [
+  //   // song 1
+  //   Song(
+  //     songName: "Do It",
+  //     artistName: "Stray kids",
+  //     albumArtImagePath: "assets/images/doit_album_cover.jpg",
+  //     audioPath: "audio/stray_kids_doit_audio.mp3",
+  //   ),
+  //   // song 2
+  //   Song(
+  //     songName: "No one noticed",
+  //     artistName: "The Marias",
+  //     albumArtImagePath: "assets/images/the_marias_album_cover.jpg",
+  //     audioPath: "audio/no_one_noticed_the_marias_audio.mp3",
+  //   ),
+  //   // song 3
+  //   Song(
+  //     songName: "Nana OST",
+  //     artistName: "Rose",
+  //     albumArtImagePath: "assets/images/nana_album_cover.jpg",
+  //     audioPath: "audio/nana_audio.mp3",
+  //   ),
+  // ];
 
   // current song playing index
   int? _currentSongIndex;
@@ -54,12 +60,18 @@ class PlaylistProvider extends ChangeNotifier {
   bool _isShuffleMode = false;
   bool _isRepeatMode = false;
 
+  // add new song
+  void addSong(Song newSong) {
+    _playlist.add(newSong);
+    notifyListeners();
+  }
+
   // play the song
 
   void play() async {
     final String path = _playlist[_currentSongIndex!].audioPath;
     await _audioPlayer.stop();
-    await _audioPlayer.play(AssetSource(path));
+    await _audioPlayer.play(DeviceFileSource(path));
     _isPlaying = true;
     notifyListeners();
   }
@@ -169,7 +181,7 @@ class PlaylistProvider extends ChangeNotifier {
     // complete
 
     _audioPlayer.onPlayerComplete.listen((event) {
-      if (_isRepeatMode) { 
+      if (_isRepeatMode) {
         // if is repeat button is active, replay the current music
         seek(Duration.zero);
         play();
