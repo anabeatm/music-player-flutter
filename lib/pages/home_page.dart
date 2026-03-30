@@ -179,7 +179,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: Text("P L A Y L I S T"),
+        title: Text("L I B R A R Y"),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
