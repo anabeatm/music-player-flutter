@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "320677223861",
+    "project_id": "minimal-music-player-4243a",
+    "storage_bucket": "minimal-music-player-4243a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:320677223861:android:5970db38c85b6a44918dfc",
+        "android_client_info": {
+          "package_name": "com.example.minimal_music_player"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCY7ZfKzriCkUczhy8peQ1ba2wqxFZtNnk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
