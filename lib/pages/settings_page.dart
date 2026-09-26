@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:minimal_music_player/themes/theme_provider.dart';
@@ -69,6 +70,30 @@ class SettingsPage extends StatelessWidget {
                     color: Theme.of(context).colorScheme.inversePrimary,
                     size: 20,
                   ),
+                ],
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () => FirebaseAuth.instance.signOut(),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondary,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Sair da conta",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                    ),
+                  ),
+                  Icon(Icons.logout, color: Colors.red, size: 20),
                 ],
               ),
             ),

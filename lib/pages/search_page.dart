@@ -36,7 +36,7 @@ class _SearchPageState extends State<SearchPage> {
             hintStyle: TextStyle(
               color: Theme.of(
                 context,
-              ).colorScheme.inversePrimary.withOpacity(0.5),
+              ).colorScheme.inversePrimary.withValues(alpha: 0.5),
             ),
           ),
           style: TextStyle(color: Theme.of(context).colorScheme.inversePrimary),
