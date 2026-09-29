@@ -60,18 +60,18 @@ class _AuthPageState extends State<AuthPage> {
   String _friendlyError(String code) {
     switch (code) {
       case 'invalid-email':
-        return 'E-mail inválido.';
+        return 'Invalid email.';
       case 'user-not-found':
-        return 'Usuário não encontrado.';
+        return 'User not found.';
       case 'wrong-password':
       case 'invalid-credential':
-        return 'E-mail ou senha incorretos.';
+        return 'Wrong email or password.';
       case 'email-already-in-use':
-        return 'Já existe uma conta com esse e-mail.';
+        return 'An account already exists with this email.';
       case 'weak-password':
-        return 'A senha precisa ter pelo menos 6 caracteres.';
+        return 'Password must be at least 6 characters.';
       default:
-        return 'Ocorreu um erro. Tente novamente.';
+        return 'Something went wrong. Please try again.';
     }
   }
 
@@ -96,7 +96,7 @@ class _AuthPageState extends State<AuthPage> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    _isLogin ? "L O G I N" : "C A D A S T R O",
+                    _isLogin ? "L O G I N" : "S I G N U P",
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 20,
@@ -113,7 +113,7 @@ class _AuthPageState extends State<AuthPage> {
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return "Informe o e-mail";
+                        return "Enter your email";
                       }
                       return null;
                     },
@@ -123,12 +123,12 @@ class _AuthPageState extends State<AuthPage> {
                     controller: _passwordController,
                     obscureText: true,
                     decoration: const InputDecoration(
-                      labelText: "Senha",
+                      labelText: "Password",
                       border: OutlineInputBorder(),
                     ),
                     validator: (value) {
                       if (value == null || value.length < 6) {
-                        return "Mínimo de 6 caracteres";
+                        return "At least 6 characters";
                       }
                       return null;
                     },
@@ -156,7 +156,7 @@ class _AuthPageState extends State<AuthPage> {
                             width: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : Text(_isLogin ? "Entrar" : "Criar conta"),
+                        : Text(_isLogin ? "Log In" : "Create Account"),
                   ),
                   const SizedBox(height: 15),
                   TextButton(
@@ -170,8 +170,8 @@ class _AuthPageState extends State<AuthPage> {
                           },
                     child: Text(
                       _isLogin
-                          ? "Não tem conta? Cadastre-se"
-                          : "Já tem conta? Entrar",
+                          ? "Don't have an account? Sign up"
+                          : "Already have an account? Log in",
                     ),
                   ),
                 ],

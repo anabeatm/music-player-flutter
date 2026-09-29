@@ -1,10 +1,10 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:minimal_music_player/models/my_playlist.dart';
 import 'package:minimal_music_player/models/song.dart';
 import 'dart:math';
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class PlaylistProvider extends ChangeNotifier {
   // final List<Song> _playlist = [];
@@ -58,11 +58,24 @@ class PlaylistProvider extends ChangeNotifier {
   Duration _currentDuration = Duration.zero;
   Duration _totalDuration = Duration.zero;
 
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   // constructor
 
   PlaylistProvider() {
     listenToDuration();
-    loadData();
+    FirebaseAuth.instance.authStateChanges().listen((user) {
+      if (user != null) {
+        loadData();
+      } else {
+        _playlists.clear();
+        _favorites.clear();
+        _history.clear();
+        _currentQueue = [];
+        _currentSongIndex = null;
+        notifyListeners();
+      }
+    });
   }
 
   // initially not playing
@@ -85,15 +98,26 @@ class PlaylistProvider extends ChangeNotifier {
 
     final currentSong = _currentQueue[_currentSongIndex!];
 
+    final String path = currentSong.audioPath;
+    await _audioPlayer.stop();
+    try {
+      if (path.startsWith('http') || path.startsWith('blob:')) {
+        await _audioPlayer.play(UrlSource(path));
+      } else {
+        await _audioPlayer.play(DeviceFileSource(path));
+      }
+    } catch (_) {
+      _isPlaying = false;
+      notifyListeners();
+      return;
+    }
+
     if (_history.isEmpty || _history.last.audioPath != currentSong.audioPath) {
       _history.add(currentSong);
       if (_history.length > 50) _history.removeAt(0);
       saveData();
     }
 
-    final String path = currentSong.audioPath;
-    await _audioPlayer.stop();
-    await _audioPlayer.play(DeviceFileSource(path));
     _isPlaying = true;
     notifyListeners();
   }
@@ -239,44 +263,57 @@ class PlaylistProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // load and save
+  // load and save (Firestore, scoped by logged-in user)
+
+  String? get _uid => FirebaseAuth.instance.currentUser?.uid;
 
   Future<void> saveData() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-      'playlists',
-      jsonEncode(_playlists.map((p) => p.toJson()).toList()),
-    );
-    await prefs.setString(
-      'favorites',
-      jsonEncode(_favorites.map((s) => s.toJson()).toList()),
-    );
-    await prefs.setString(
-      'history',
-      jsonEncode(_history.map((s) => s.toJson()).toList()),
-    );
+    final uid = _uid;
+    if (uid == null) return;
+
+    await _firestore.collection('users').doc(uid).set({
+      'playlists': _playlists.map((p) => p.toJson()).toList(),
+      'favorites': _favorites.map((s) => s.toJson()).toList(),
+      'history': _history.map((s) => s.toJson()).toList(),
+    }, SetOptions(merge: true));
   }
 
   Future<void> loadData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? playlistsJson = prefs.getString('playlists');
-    if (playlistsJson != null) {
-      final List decoded = jsonDecode(playlistsJson);
-      _playlists.clear();
-      _playlists.addAll(decoded.map((p) => MyPlaylist.fromJson(p)).toList());
-    }
-    final String? favoritesJson = prefs.getString('favorites');
-    if (favoritesJson != null) {
-      final List decoded = jsonDecode(favoritesJson);
-      _favorites.clear();
-      _favorites.addAll(decoded.map((s) => Song.fromJson(s)).toList());
-    }
+    final uid = _uid;
+    if (uid == null) return;
 
-    final String? historyJson = prefs.getString('history');
-    if (historyJson != null) {
-      final List decoded = jsonDecode(historyJson);
-      _history.clear();
-      _history.addAll(decoded.map((s) => Song.fromJson(s)).toList());
+    final doc = await _firestore.collection('users').doc(uid).get();
+    final data = doc.data();
+
+    _playlists.clear();
+    _favorites.clear();
+    _history.clear();
+
+    if (data != null) {
+      final List? playlistsData = data['playlists'];
+      if (playlistsData != null) {
+        _playlists.addAll(
+          playlistsData.map(
+            (p) => MyPlaylist.fromJson(Map<String, dynamic>.from(p)),
+          ),
+        );
+      }
+
+      final List? favoritesData = data['favorites'];
+      if (favoritesData != null) {
+        _favorites.addAll(
+          favoritesData.map(
+            (s) => Song.fromJson(Map<String, dynamic>.from(s)),
+          ),
+        );
+      }
+
+      final List? historyData = data['history'];
+      if (historyData != null) {
+        _history.addAll(
+          historyData.map((s) => Song.fromJson(Map<String, dynamic>.from(s))),
+        );
+      }
     }
 
     notifyListeners();

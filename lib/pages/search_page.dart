@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:minimal_music_player/components/cover_image.dart';
 import 'package:provider/provider.dart';
 import 'package:minimal_music_player/models/playlist_provider.dart';
 import 'package:minimal_music_player/pages/song_page.dart';
@@ -56,11 +56,15 @@ class _SearchPageState extends State<SearchPage> {
                 return ListTile(
                   leading: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: Image.file(
-                      File(song.albumArtImagePath),
+                    child: CoverImage(
+                      path: song.albumArtImagePath,
                       width: 50,
                       height: 50,
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Theme.of(context).colorScheme.secondary,
+                        child: const Icon(Icons.music_note),
+                      ),
                     ),
                   ),
                   title: Text(song.songName),

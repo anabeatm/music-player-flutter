@@ -1,11 +1,14 @@
-import 'dart:io';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:minimal_music_player/components/cover_image.dart';
 import 'package:minimal_music_player/components/my_drawer.dart';
 import 'package:provider/provider.dart';
 import 'package:minimal_music_player/models/playlist_provider.dart';
 import 'package:minimal_music_player/models/my_playlist.dart';
 import 'package:minimal_music_player/pages/playlist_page.dart';
+import 'package:minimal_music_player/utils/blob_url.dart';
+import 'package:minimal_music_player/utils/mime_type.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -58,11 +61,17 @@ class _HomePageState extends State<HomePage> {
                       ),
                       onPressed: () async {
                         FilePickerResult? result = await FilePicker.platform
-                            .pickFiles(type: FileType.image);
+                            .pickFiles(type: FileType.image, withData: true);
                         if (result != null) {
+                          final file = result.files.single;
+                          final String path = kIsWeb
+                              ? createBlobUrl(
+                                  file.bytes!,
+                                  guessImageMimeType(file.extension),
+                                )
+                              : file.path!;
                           setDialogState(() {
-                            selectedPlaylistImagePath =
-                                result.files.single.path;
+                            selectedPlaylistImagePath = path;
                           });
                         }
                       },
@@ -77,8 +86,8 @@ class _HomePageState extends State<HomePage> {
                     if (selectedPlaylistImagePath != null)
                       Padding(
                         padding: const EdgeInsets.only(top: 10),
-                        child: Image.file(
-                          File(selectedPlaylistImagePath!),
+                        child: CoverImage(
+                          path: selectedPlaylistImagePath!,
                           height: 50,
                           width: 50,
                           fit: BoxFit.cover,
@@ -164,8 +173,8 @@ class _HomePageState extends State<HomePage> {
               return ListTile(
                 leading: ClipRRect(
                   borderRadius: BorderRadius.circular(4),
-                  child: Image.file(
-                    File(playlist.playlistImagePath),
+                  child: CoverImage(
+                    path: playlist.playlistImagePath,
                     width: 40,
                     height: 40,
                     fit: BoxFit.cover,

@@ -75,7 +75,10 @@ class SettingsPage extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () => FirebaseAuth.instance.signOut(),
+            onTap: () {
+              Navigator.of(context).popUntil((route) => route.isFirst);
+              FirebaseAuth.instance.signOut();
+            },
             child: Container(
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.secondary,
@@ -87,7 +90,7 @@ class SettingsPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Sair da conta",
+                    "Log Out",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.red,

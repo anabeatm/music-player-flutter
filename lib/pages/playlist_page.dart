@@ -1,11 +1,14 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:minimal_music_player/components/cover_image.dart';
 import 'package:minimal_music_player/models/song.dart';
 import 'package:minimal_music_player/models/my_playlist.dart';
 import 'package:minimal_music_player/models/playlist_provider.dart';
 import 'package:minimal_music_player/pages/song_page.dart';
+import 'package:minimal_music_player/utils/blob_url.dart';
+import 'package:minimal_music_player/utils/mime_type.dart';
 
 class PlaylistPage extends StatefulWidget {
   final MyPlaylist playlist;
@@ -68,10 +71,17 @@ class _PlaylistPageState extends State<PlaylistPage> {
                       ),
                       onPressed: () async {
                         FilePickerResult? result = await FilePicker.platform
-                            .pickFiles(type: FileType.audio);
+                            .pickFiles(type: FileType.audio, withData: true);
                         if (result != null) {
+                          final file = result.files.single;
+                          final String path = kIsWeb
+                              ? createBlobUrl(
+                                  file.bytes!,
+                                  guessAudioMimeType(file.extension),
+                                )
+                              : file.path!;
                           setDialogState(() {
-                            selectedAudioPath = result.files.single.path;
+                            selectedAudioPath = path;
                           });
                         }
                       },
@@ -94,10 +104,17 @@ class _PlaylistPageState extends State<PlaylistPage> {
                       ),
                       onPressed: () async {
                         FilePickerResult? result = await FilePicker.platform
-                            .pickFiles(type: FileType.image);
+                            .pickFiles(type: FileType.image, withData: true);
                         if (result != null) {
+                          final file = result.files.single;
+                          final String path = kIsWeb
+                              ? createBlobUrl(
+                                  file.bytes!,
+                                  guessImageMimeType(file.extension),
+                                )
+                              : file.path!;
                           setDialogState(() {
-                            selectedImagePath = result.files.single.path;
+                            selectedImagePath = path;
                           });
                         }
                       },
@@ -189,8 +206,8 @@ class _PlaylistPageState extends State<PlaylistPage> {
                         child: SizedBox(
                           width: 50,
                           height: 50,
-                          child: Image.file(
-                            File(song.albumArtImagePath),
+                          child: CoverImage(
+                            path: song.albumArtImagePath,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) =>
                                 Container(

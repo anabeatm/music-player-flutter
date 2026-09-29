@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:minimal_music_player/themes/light_mode.dart';
 import 'package:minimal_music_player/themes/dark_mode.dart';
 
-// implementando seleção de temas para o app
 class ThemePreset {
   final String name;
   final ThemeData lightTheme;
@@ -68,19 +67,29 @@ class ThemeProvider extends ChangeNotifier {
   }
 
   ThemePreset _generatePresetFromColor(String name, Color color) {
+    final lightScheme = ColorScheme.fromSeed(
+      seedColor: color,
+      brightness: Brightness.light,
+    );
+    final darkScheme = ColorScheme.fromSeed(
+      seedColor: color,
+      brightness: Brightness.dark,
+    );
+
+    // This app uses colorScheme.inversePrimary as its general "text/icon on
+    // surface" color everywhere (see song_page, settings_page, my_drawer,
+    // etc). Material 3's own inversePrimary is meant for content on a dark
+    // inverseSurface, not on the regular surface — using it as-is here gives
+    // low-contrast, mismatched text on generated presets. Overriding it with
+    // onSurface keeps every preset readable and consistent with the
+    // hand-tuned monochromatic theme.
     return ThemePreset(
       name: name,
       lightTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: color,
-          brightness: Brightness.light,
-        ),
+        colorScheme: lightScheme.copyWith(inversePrimary: lightScheme.onSurface),
       ),
       darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: color,
-          brightness: Brightness.dark,
-        ),
+        colorScheme: darkScheme.copyWith(inversePrimary: darkScheme.onSurface),
       ),
     );
   }

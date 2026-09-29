@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:minimal_music_player/pages/discover_page.dart';
 import 'package:minimal_music_player/pages/favorite_page.dart';
 import 'package:minimal_music_player/pages/history_page.dart';
 import 'package:minimal_music_player/pages/search_page.dart';
@@ -60,6 +61,20 @@ class MyDrawer extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const SearchPage()),
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 25.0, top: 0),
+            child: ListTile(
+              title: const Text("D I S C O V E R"),
+              leading: const Icon(Icons.travel_explore),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const DiscoverPage()),
                 );
               },
             ),

@@ -1,1 +1,28 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"minimal-music-player-4243a","appId":"1:320677223861:android:5970db38c85b6a44918dfc","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"minimal-music-player-4243a","configurations":{"android":"1:320677223861:android:5970db38c85b6a44918dfc","ios":"1:320677223861:ios:b5664a898135a4d1918dfc","macos":"1:320677223861:ios:b5664a898135a4d1918dfc","web":"1:320677223861:web:0de9506379964e1f918dfc","windows":"1:320677223861:web:31907d812a7793ca918dfc"}}}}}}
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "minimal-music-player-4243a",
+          "appId": "1:320677223861:android:5970db38c85b6a44918dfc",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "minimal-music-player-4243a",
+          "configurations": {
+            "android": "1:320677223861:android:5970db38c85b6a44918dfc",
+            "ios": "1:320677223861:ios:b5664a898135a4d1918dfc",
+            "macos": "1:320677223861:ios:b5664a898135a4d1918dfc",
+            "web": "1:320677223861:web:0de9506379964e1f918dfc",
+            "windows": "1:320677223861:web:31907d812a7793ca918dfc"
+          }
+        }
+      }
+    }
+  }
+}

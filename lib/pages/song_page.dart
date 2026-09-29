@@ -1,11 +1,68 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:minimal_music_player/components/cover_image.dart';
 import 'package:minimal_music_player/components/neu_box.dart';
 import 'package:provider/provider.dart';
 import 'package:minimal_music_player/models/playlist_provider.dart';
+import 'package:minimal_music_player/models/song.dart';
+import 'package:minimal_music_player/services/lyrics_service.dart';
 
 class SongPage extends StatelessWidget {
   const SongPage({super.key});
+
+  void _showLyrics(BuildContext context, Song song) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      isScrollControlled: true,
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          minChildSize: 0.3,
+          maxChildSize: 0.9,
+          expand: false,
+          builder: (context, scrollController) {
+            return FutureBuilder<String?>(
+              future: LyricsService.fetchLyrics(
+                song.artistName,
+                song.songName,
+              ),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final lyrics = snapshot.data;
+                if (snapshot.hasError || lyrics == null || lyrics.trim().isEmpty) {
+                  return const Center(child: Text("Lyrics not found."));
+                }
+                return SingleChildScrollView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        song.songName,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        song.artistName,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(lyrics, style: const TextStyle(height: 1.5)),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +79,15 @@ class SongPage extends StatelessWidget {
         final song = playlist[currentSongIndex];
         return Scaffold(
           backgroundColor: Theme.of(context).colorScheme.surface,
-          appBar: AppBar(title: Text(song.songName)),
+          appBar: AppBar(
+            title: Text(song.songName),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.lyrics_outlined),
+                onPressed: () => _showLyrics(context, song),
+              ),
+            ],
+          ),
           body: SafeArea(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -34,8 +99,8 @@ class SongPage extends StatelessWidget {
                       aspectRatio: 1 / 1,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(15),
-                        child: Image.file(
-                          File(song.albumArtImagePath),
+                        child: CoverImage(
+                          path: song.albumArtImagePath,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) =>
                               Container(
