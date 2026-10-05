@@ -136,6 +136,29 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Future<void> confirmDeletePlaylist(MyPlaylist playlist) async {
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: const Text("Delete playlist"),
+        content: Text("Delete \"${playlist.name}\" and its songs?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text("Delete"),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) playlistProvider.deletePlaylist(playlist);
+  }
+
   void goToPlaylist(MyPlaylist playlist) {
     Navigator.push(
       context,
@@ -187,6 +210,10 @@ class _HomePageState extends State<HomePage> {
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text("${playlist.songs.length} songs"),
+                trailing: IconButton(
+                  icon: const Icon(Icons.delete_outline),
+                  onPressed: () => confirmDeletePlaylist(playlist),
+                ),
                 onTap: () => goToPlaylist(playlist),
               );
             },

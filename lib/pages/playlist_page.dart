@@ -26,6 +26,35 @@ class _PlaylistPageState extends State<PlaylistPage> {
     Navigator.push(context, songPageRoute());
   }
 
+  Future<void> confirmDeleteSong(
+    PlaylistProvider provider,
+    int songIndex,
+  ) async {
+    final Song song = widget.playlist.songs[songIndex];
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: const Text("Delete music"),
+        content: Text("Remove \"${song.songName}\" from this playlist?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text("Delete"),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      provider.removeSongFromPlaylist(widget.playlist, songIndex);
+    }
+  }
+
   void showAddSongDialog(PlaylistProvider provider) {
     TextEditingController nameController = TextEditingController();
     TextEditingController artistController = TextEditingController();
@@ -215,6 +244,10 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                 ),
                           ),
                         ),
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete_outline),
+                        onPressed: () => confirmDeleteSong(value, index),
                       ),
                       onTap: () => goToSong(index, value),
                     );

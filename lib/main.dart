@@ -8,6 +8,7 @@ import 'package:minimal_music_player/themes/theme_provider.dart';
 import 'package:minimal_music_player/utils/app_navigator.dart';
 import 'package:minimal_music_player/utils/mini_player_route_observer.dart';
 import 'package:provider/provider.dart';
+
 import 'pages/auth_page.dart';
 import 'pages/home_page.dart';
 

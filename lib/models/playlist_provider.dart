@@ -28,6 +28,37 @@ class PlaylistProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // removes a song from a playlist, keeping the playing queue consistent
+  void removeSongFromPlaylist(MyPlaylist playlist, int songIndex) {
+    final bool isActiveQueue = identical(_currentQueue, playlist.songs);
+    playlist.songs.removeAt(songIndex);
+
+    if (isActiveQueue && _currentSongIndex != null) {
+      if (songIndex == _currentSongIndex) {
+        _stopPlayback();
+      } else if (songIndex < _currentSongIndex!) {
+        _currentSongIndex = _currentSongIndex! - 1;
+      }
+    }
+    saveData();
+    notifyListeners();
+  }
+
+  void deletePlaylist(MyPlaylist playlist) {
+    if (identical(_currentQueue, playlist.songs)) _stopPlayback();
+    _playlists.remove(playlist);
+    saveData();
+    notifyListeners();
+  }
+
+  // stops the audio and clears the current queue
+  void _stopPlayback() {
+    _audioPlayer.stop();
+    _isPlaying = false;
+    _currentQueue = [];
+    _currentSongIndex = null;
+  }
+
   // QUENUE
 
   List<Song> _currentQueue = [];
