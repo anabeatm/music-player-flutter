@@ -62,6 +62,7 @@ class PlaylistProvider extends ChangeNotifier {
 
   // constructor
 
+  // listens to login: signed in -> load user data, signed out -> clear everything
   PlaylistProvider() {
     listenToDuration();
     FirebaseAuth.instance.authStateChanges().listen((user) {
@@ -86,12 +87,14 @@ class PlaylistProvider extends ChangeNotifier {
   bool _isShuffleMode = false;
   bool _isRepeatMode = false;
 
+  // sets the queue and index, the currentSongIndex setter already calls play()
   void playFromPlaylist(MyPlaylist selectedPlaylist, int songIndex) {
     _currentQueue = selectedPlaylist.songs;
     currentSongIndex = songIndex;
   }
 
   // play the song
+  // stops the previous audio, plays the current song and adds it to history
 
   void play() async {
     if (_currentQueue.isEmpty || _currentSongIndex == null) return;
@@ -101,6 +104,7 @@ class PlaylistProvider extends ChangeNotifier {
     final String path = currentSong.audioPath;
     await _audioPlayer.stop();
     try {
+      // urls play as UrlSource, anything else is a file on the device
       if (path.startsWith('http') || path.startsWith('blob:')) {
         await _audioPlayer.play(UrlSource(path));
       } else {
@@ -171,7 +175,7 @@ class PlaylistProvider extends ChangeNotifier {
   }
 
   // play next
-
+  // shuffle picks a random one, otherwise next 
   void playNextSong() {
     if (_currentSongIndex != null && _currentQueue.isNotEmpty) {
       if (_isShuffleMode) {
@@ -191,6 +195,7 @@ class PlaylistProvider extends ChangeNotifier {
   }
 
   // play previous
+  // past 2s restarts the song, otherwise goes to the previous one
 
   void playPreviousSong() async {
     if (_currentQueue.isEmpty) return;
@@ -205,7 +210,8 @@ class PlaylistProvider extends ChangeNotifier {
     }
   }
 
-  // listen to duration
+  // listens to total duration, current position and song end
+  // (when it ends: repeat replays it, otherwise plays the next one)
 
   void listenToDuration() {
     _audioPlayer.onDurationChanged.listen((newDuration) {
@@ -228,6 +234,7 @@ class PlaylistProvider extends ChangeNotifier {
     });
   }
 
+  // add/remove from favorites 
   void toggleFavorite(Song song) {
     if (isFavorite(song)) {
       _favorites.removeWhere((s) => s.audioPath == song.audioPath);
@@ -263,10 +270,11 @@ class PlaylistProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // load and save (Firestore, scoped by logged-in user)
+  // load and save
 
   String? get _uid => FirebaseAuth.instance.currentUser?.uid;
 
+  // saves playlists, favorites and history to users
   Future<void> saveData() async {
     final uid = _uid;
     if (uid == null) return;
@@ -278,6 +286,7 @@ class PlaylistProvider extends ChangeNotifier {
     }, SetOptions(merge: true));
   }
 
+  // reads the user doc and rebuilds the lists
   Future<void> loadData() async {
     final uid = _uid;
     if (uid == null) return;

@@ -3,9 +3,11 @@ import 'package:http/http.dart' as http;
 import 'package:minimal_music_player/models/song.dart';
 
 class ITunesService {
+  // search songs on the itunes api and return a list of Song
   static Future<List<Song>> search(String term) async {
     if (term.trim().isEmpty) return [];
 
+    // build the url: search term, music only, max 25 results
     final uri = Uri.https('itunes.apple.com', '/search', {
       'term': term,
       'media': 'music',
@@ -21,6 +23,7 @@ class ITunesService {
     final data = jsonDecode(response.body) as Map<String, dynamic>;
     final results = data['results'] as List;
 
+    // only keep items with a previewUrl and turn each one into a Song
     return results
         .where((r) => r['previewUrl'] != null && r['trackName'] != null)
         .map((r) {

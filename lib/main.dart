@@ -12,10 +12,12 @@ import 'pages/auth_page.dart';
 import 'pages/home_page.dart';
 
 void main() async {
+  // wait for firebase to be ready before opening the app
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(
+    // theme and player state available to every screen
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
@@ -35,6 +37,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       navigatorKey: appNavigatorKey,
       navigatorObservers: [MiniPlayerRouteObserver()],
+      // watches the login: user -> home, no user -> login page
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
@@ -47,6 +50,7 @@ class MyApp extends StatelessWidget {
         },
       ),
       theme: Provider.of<ThemeProvider>(context).themeData,
+      // mini player stays at the bottom of every screen
       builder: (context, child) {
         return Column(
           children: [

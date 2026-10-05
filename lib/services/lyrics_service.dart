@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class LyricsService {
+  // get the lyrics from lyrics.ovh, returns null if not found
   static Future<String?> fetchLyrics(String artist, String title) async {
     final uri = Uri(
       scheme: 'https',
