@@ -6,7 +6,7 @@ import 'package:minimal_music_player/components/cover_image.dart';
 import 'package:minimal_music_player/models/song.dart';
 import 'package:minimal_music_player/models/my_playlist.dart';
 import 'package:minimal_music_player/models/playlist_provider.dart';
-import 'package:minimal_music_player/pages/song_page.dart';
+import 'package:minimal_music_player/pages/song_page_route.dart';
 import 'package:minimal_music_player/utils/blob_url.dart';
 import 'package:minimal_music_player/utils/mime_type.dart';
 
@@ -23,10 +23,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
   void goToSong(int songIndex, PlaylistProvider provider) {
     provider.playFromPlaylist(widget.playlist, songIndex);
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const SongPage()),
-    );
+    Navigator.push(context, songPageRoute());
   }
 
   void showAddSongDialog(PlaylistProvider provider) {

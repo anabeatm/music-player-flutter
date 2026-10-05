@@ -36,10 +36,6 @@ class ITunesService {
         .toList();
   }
 
-  /// The iTunes artwork CDN (mzstatic.com) doesn't send CORS headers, which
-  /// Flutter Web's CanvasKit renderer requires to fetch image pixels.
-  /// Routing through images.weserv.nl re-serves the same image with CORS
-  /// enabled, so covers load correctly on web (and work fine natively too).
   static String _proxiedImageUrl(String url) {
     if (url.isEmpty) return url;
     final withoutScheme = url.replaceFirst(RegExp(r'^https?://'), '');

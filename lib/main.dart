@@ -1,9 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:minimal_music_player/components/mini_player.dart';
 import 'package:minimal_music_player/firebase_options.dart';
 import 'package:minimal_music_player/models/playlist_provider.dart';
 import 'package:minimal_music_player/themes/theme_provider.dart';
+import 'package:minimal_music_player/utils/app_navigator.dart';
+import 'package:minimal_music_player/utils/mini_player_route_observer.dart';
 import 'package:provider/provider.dart';
 import 'pages/auth_page.dart';
 import 'pages/home_page.dart';
@@ -30,6 +33,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      navigatorKey: appNavigatorKey,
+      navigatorObservers: [MiniPlayerRouteObserver()],
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
@@ -42,6 +47,14 @@ class MyApp extends StatelessWidget {
         },
       ),
       theme: Provider.of<ThemeProvider>(context).themeData,
+      builder: (context, child) {
+        return Column(
+          children: [
+            Expanded(child: child ?? const SizedBox.shrink()),
+            const MiniPlayer(),
+          ],
+        );
+      },
     );
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:minimal_music_player/components/cover_image.dart';
 import 'package:provider/provider.dart';
 import 'package:minimal_music_player/models/playlist_provider.dart';
-import 'package:minimal_music_player/pages/song_page.dart';
+import 'package:minimal_music_player/pages/song_page_route.dart';
 
 class HistoryPage extends StatelessWidget {
   const HistoryPage({super.key});
@@ -43,10 +43,7 @@ class HistoryPage extends StatelessWidget {
                 trailing: const Icon(Icons.history),
                 onTap: () {
                   provider.playQueue(history, index);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const SongPage()),
-                  );
+                  Navigator.push(context, songPageRoute());
                 },
               );
             },
